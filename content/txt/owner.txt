@@ -1,0 +1,6 @@
+SuperAdmin (Bot Owner) Commands:
+ {}invite - Gets the bot invite link.
+ {}prefix - Changes the current command prefix
+ {}leave - Bot leaves server that the command is sent in.
+
+end

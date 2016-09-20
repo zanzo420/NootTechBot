@@ -1,0 +1,13 @@
+discord.py
+git+https://github.com/smiley/steamapi
+git+https://github.com/novel/py-urbandict
+beautifulsoup4
+cleverbot
+imgurpython
+lxml
+selenium
+youtube_dl
+numpy
+wordcloud
+pillow
+goslate

@@ -1,0 +1,10 @@
+Music Commands:
+ {}add [Link] or - Adds YouTube or Soundcloud song.
+ {}add [Phrase] - Adds first YouTube video result to playlist.
+ {}playlist - Shows the current music playlist.
+ {}song/!playing/!currentsong - Shows currently playing song
+ {}skip - Submits your vote to skip a song (force-skip admin only).
+ {}remove [Song Number] - Removes a song from the playlist (admin/submitter only)
+ {}volume - Toggles the bot volume (mods/admins only)
+
+end

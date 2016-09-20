@@ -1,0 +1,16 @@
+Translate :
+ {}translate [Country ISO Code] **Sentence**
+ {}translate [Country] **Sentence**
+ {}translate French Hello my name is denBot (Example)
+
+Supported ISO Codes:
+ SQ - Albanian, AR - Arabic, HY - Armenian, BG - Bulgarian, CA - Catalan
+ CS - Czech, ZH - Chinese, HR - Croatian, DA - Danish, NL - Dutch, EN - English
+ ES - Estonian, FI - Finnish, FR - French, EL - Greek, KA - Georgian, DE - German 
+ HE - Hebrew, HI - Hindi, HU - Hungarian, GA - Irish, ID - Indonesian, IT - Italian
+ IS - Icelandic, JA - Japanese, KO - Korean, LV - Latvian, LA - Latin, LT - Lithuanian
+ MT - Maltese, MN - Mongolian, NN - Norwegian, FA - Persian, PL - Polish, PT - Portuguese
+ RO - Romanian, RU - Russian, SK - Slovak, SL - Slovenian, SO - Somali, SR - Serbian
+ SV - Swedish, TH - Thai, TR - Turkish, UK - Ukrainian, VI - Vietnamese, CY - Welsh
+
+end

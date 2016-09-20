@@ -1,0 +1,12 @@
+Admin Commands:
+ {}connect (Admin Only) Gets bot to join current channel.
+ {}disconnect (Admin Only) Disconnects Bot from current channel.
+ {}skip (Admin Only) Skips current song being played by Bot.
+ {}game [Game] - Set game played by Bot.
+ {}avatar [URL] - Sets the bot avatar.
+ {}stream - Links everyone to the current servers streamer link.
+ {}block [@username] - Adds specified user to the bot blacklist
+ {}unblock [@username] - Removes specified user to the bot blacklist
+ {}blacklist - DMâ€™s you the current blacklist of users on your server
+
+end

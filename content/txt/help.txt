@@ -1,0 +1,15 @@
+Utility Commands:
+ {}steam [Custom URL]/[Steam ID] - Steam Profile Info. â€œ!steam?â€ for help
+ {}youtube [Query] - Searches YouTube & posts first video result
+ {}google [Query] - Searches google & posts first result
+ {}define [Word] - Uses the Merriam-Webster Dictionary for definitions.
+ {}urban [Word/Phrase] - Gets definition from Urb&ictionary
+ {}imdb [movie title] - Gets the IMDB Information for titles.
+ {}wordcloud - Generates Server-wide Wordcloud.
+ {}translate [language] [sentence] - Uses an Goslate API to translate from English.
+ {}coinflip - Flips a coin.
+ {}CNN - CNN.com Current News Headline
+ {}BBC - BBC.co.co.uk Current News Headline
+ {}uptime - Displays current bot uptime duration.
+
+end
