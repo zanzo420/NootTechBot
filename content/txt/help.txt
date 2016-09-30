@@ -1,15 +1,40 @@
+Search Commands (Safe for work):
+--------------------------------
+ [{}steam][URL/SteamID] - Steam Profile Info.
+ [{}youtube][SEARCH] - Searches YouTube & posts first video result
+ [{}google][SEARCH] - Searches google & posts first result
+
 Utility Commands:
- {}steam [Custom URL]/[Steam ID] - Steam Profile Info. â€œ!steam?â€ for help
- {}youtube [Query] - Searches YouTube & posts first video result
- {}google [Query] - Searches google & posts first result
- {}define [Word] - Uses the Merriam-Webster Dictionary for definitions.
- {}urban [Word/Phrase] - Gets definition from Urb&ictionary
- {}imdb [movie title] - Gets the IMDB Information for titles.
- {}wordcloud - Generates Server-wide Wordcloud.
- {}translate [language] [sentence] - Uses an Goslate API to translate from English.
- {}coinflip - Flips a coin.
- {}CNN - CNN.com Current News Headline
- {}BBC - BBC.co.co.uk Current News Headline
- {}uptime - Displays current bot uptime duration.
+-----------------
+ [{}translate][LANGUAGE & SENTENCE] - Look at help commands below for instructions.
+ [{}define][WORD] - PMs you dictionary results from the Merriam-Webster Dictionary.
+ [{}urban][PHRASE] - PMs you definition from UrbanDictionary
+ [{}imdb][MOVIE TITLE] - PMs you the IMDB Information for titles.
+ [{}calc][QUERY] or...
+ [{}wolfram][QUERY] - PMs result from Wolfram Alpha Knowledge Engine.
+
+Random Commands:
+----------------
+ [{}wordcloud][] - Generates Server-wide Wordcloud.
+ [{}coinflip][] - Flips a coin.
+ [{}bosh][@USER] - Bosh someone who deserves it!
+ [{}CNN][] - CNN.com Current News Headline
+ [{}BBC][] - BBC.co.co.uk Current News Headline
+ [{}uptime][] - Displays current bot uptime duration.
+
+Help Commands:
+--------------
+ [{}help][] - PMs you this current list of commands!
+ [{}music][] - PMs you all of the music commands.
+ [{}admin][] - PMs admins/mods the admin commands.
+ [{}votehelp][] - PMs you all vote-related commands.
+ [{}steamhelp][] - Short tutorial on using steam command.
+ [{}translatehelp][] - In-depth tutorial on using translate command.
+
+Meme Commands (Works in #Meme Only):
+------------------------------------
+ [{}pepe][] - Randomly posts a Pepe meme.
+ [{}slav][] - Random posts a Slav meme.
+ [{}doggo][] - Randomly posts a Doggo meme.
 
 end

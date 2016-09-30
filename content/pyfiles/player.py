@@ -1,9 +1,7 @@
 import discord, youtube_dl, asyncio, configparser
-from lxml import etree
-import urllib.request as ur
 
 settings = configparser.ConfigParser()
-settings.read('content/Settings.ini')
+settings.read('Settings.ini')
 
 
  # ---------------------------------------------------------------------------
@@ -13,24 +11,23 @@ settings.read('content/Settings.ini')
  # ---------------------------------------------------------------------------
 
 class Player(discord.Client):
+
+
+
     # Create variables when created
     def __init__(self, client, server):
         super().__init__()
-
-        # Single server voice client and music player
         self.voice_client = None
         self.player = None
-
-        # Will hold dictionary with name, url and requester
         self.playlist = []
-        self.max_playlist_length = 2
-        self.player_length = 480
-
-
-        #Bot and server it is in
+        self.max_playlist_length = int(settings['PLAYER']['YoutubePlaylistCap'])
+        self.player_length = int(settings['PLAYER']['MaxSongLength'])*60
+        self.max_song_requests = int(settings['PLAYER']['MaxUserSongRequests'])-1
+        self.playlist_cap = int(settings['PLAYER']['BotPlaylistCap'])
         self.client = client
         self.server = server
         self.volume = float(settings['PLAYER']['defaultvol'])
+
         try:
             self.useav = settings['PLAYER']['useavonv']
         except:
@@ -40,33 +37,33 @@ class Player(discord.Client):
         # Skip and text channel to post np
         self.skip = False
         for channel in server.channels:
-            if str(settings['BOTSETTINGS']['channel']) in channel.name:
+            if str(settings['BOTSETTINGS']['DefaultChannel']) == channel.name.lower():
                 self.text_channel = channel
                 break
             else:
                 self.text_channel = server.default_channel
 
         self.get_music_channel()
-
-
-        # Skip (if active/current voters that have voted to skip)
         self.skip = False
         self.skips_needed = 0
         self.votes = []
 
-    def get_music_channel(self):
-        '''
-        Function to find a text channel with 'music' or 'bot' in the name
-        Else it uses the default channel of the server
-        :return: None
-        '''
 
+
+
+
+    def get_music_channel(self):
         for channel in self.server.channels:
             if channel.type == discord.ChannelType.text:
                 #checks if there are text channels with name 'bot' or 'music' or that contains 'bot' or 'music'
-                if str(settings['BOTSETTINGS']['channel']) in channel.name.lower():
+                if str(settings['BOTSETTINGS']['DefaultChannel']) == channel.name.lower():
                     self.text_channel = channel
                     break
+
+
+
+
+
 
     async def get_voice_client(self, channel=None, reset=False):
 
@@ -133,105 +130,111 @@ class Player(discord.Client):
 
     async def add_playlist(self, url, message, type='y'):
 
-        user_occurance = 0
-        ytdl = youtube_dl.YoutubeDL()
-        if "youtube" in url:
-            youtube = etree.HTML(ur.urlopen(url).read())
-            video_title = youtube.xpath("//span[@id='eow-title']/@title")[0]
-        elif "soundcloud" in url:
-            result = ytdl.extract_info(url, download=False)
-            video_title = result['title']
-        print(video_title)
-        video_already_present = False
-
-        for item in self.playlist:
-            if item['user'] == message.author.mention:
-                user_occurance += 1
-            if item['title'] == video_title:
-                video_already_present = True
-
-        if len(self.playlist) > 25:
-            await self.client.send_message(message.channel, ":notes: The playlist is at capacity (25 songs). Please try again later.")
-        elif user_occurance > 4:
-            await self.client.send_message(message.channel, ":notes: You currently have 4 songs in the playlist. Please try again later.")
-        elif video_already_present == True:
-            await self.client.send_message(message.channel, ":notes: A song with this title is already in this playlist.")
+        if len(self.playlist) > self.playlist_cap:
+            await self.client.send_message(message.channel, ":notes: The playlist is at capacity ("+self.playlist_cap+" songs). Please try again later.")
         else:
-
-            # If song is already in playlist, tell user.
-            # If user already has 3 songs in the playlist, cannot add anymore until they have just 1 left to play.
-
-            # Function to add youtube or soundcloud songs or playlists
-            # url: string, message: discord.Message, type: string
             if type=='y':
-                # If link = playlist, start at current song and download 4 more.
                 startpos = 1
-                endpos = 5
-
-                # If there is an index in the link
+                endpos = 2
                 if '&index=' in url:
+                    isPlaylist = True
                     temp = url.split('&')
                     for i in range(0, (len(temp))):
                         if 'index=' in temp[i]:
-                            # Get start pos and end pos for playlist
                             sstart = temp[i].replace('index=', '')
                             startpos = int(sstart)
                             endpos = startpos + self.max_playlist_length - 1
                             break
-
-                # Set youtube download to use start pos and end pos to get information
                 ytdl = youtube_dl.YoutubeDL({'playliststart': startpos, 'playlistend': endpos})
-
-                cont = True
                 try:
                     result = ytdl.extract_info(url, download=False)
                     cont = True
                 except youtube_dl.utils.DownloadError as e:
                     cont = False
-                    # Invalid Link
                     if 'Incomplete YouTube ID' in str(e):
                         msg = '{0.author.name} : Not a valid Youtube video'
                         self.client.send_message(message.channel, msg.format(message))
 
+
                 if cont:
-                    # If the link was a playlist
+                    user_occurance = 0
+
+                    # Checks if the message author is an admin
+                    admin = False
+                    for role in message.author.roles:
+                        if settings['BOTSETTINGS']['botadmin'] in role.name or "Loser" in role.name or "Admin" in role.name:
+                            admin = True
+
                     if 'entries' in result:
+                        queued = 0
                         for i in range(0, len(result['entries'])):
                             # Get video url, title and set requester
                             url = result['entries'][i]['webpage_url']
                             title = result['entries'][i]['title']
+                            video_already_present = False
                             user = message.author.mention
                             name = message.author.name
                             id = message.author.id
-                            # Make sure the video title cannot break code box in message
+
+                            for item in self.playlist:
+                                if item['user'] == user:
+                                    user_occurance += 1
+                                if item['title'] == title:
+                                    video_already_present = True
+
+                            if user_occurance > self.max_song_requests and (admin == False):
+                                await self.client.send_message(message.channel,
+                                                               ":notes: You currently have "+str(self.max_song_requests+1)+" songs in the playlist. Please try again later.")
+                            elif video_already_present:
+                                await self.client.send_message(message.channel,
+                                                               ":notes: A song with the title `"+title+"` is already in this playlist.")
+                            else:
+
+
+                                if '`' in title:
+                                    title = title.replace('`', '\'')
+
+                                self.playlist.append({'url': url, 'title': title, 'user': user, 'name': name, 'id': id})
+                                print(title + ' Added to queue')
+                                queued = queued + 1
+
+
+
+                        # Tell user the amount of playlist songs queued
+                        msg = 'Queued: `' + str(queued) + ' song(s)`'
+                        await self.client.send_message(message.channel, msg.format(message))
+
+                    # Else it is a single video
+                    else:
+                        user_occurance = 0
+                        video_already_present = False
+                        url = result['webpage_url']
+                        title = result['title']
+                        user = message.author.mention
+                        name = message.author.name
+                        id = message.author.id
+
+
+                        for item in self.playlist:
+                            if item['user'] == user:
+                                user_occurance += 1
+                            if item['title'] == title:
+                                video_already_present = True
+
+                        if user_occurance > self.max_song_requests and (admin == False):
+                            await self.client.send_message(message.channel,":notes: You currently have " + str(self.max_song_requests + 1) + " songs in the playlist. Please try again later.")
+                        elif video_already_present:
+                            await self.client.send_message(message.channel,":notes: A song with the title `" + title + "` is already in this playlist.")
+                        else:
                             if '`' in title:
                                 title = title.replace('`', '\'')
                             # Add info to playlist
                             self.playlist.append({'url': url, 'title': title, 'user': user, 'name': name, 'id':id})
                             print(title + ' Added to queue')
 
-                        # Tell user the amount of playlist songs queued
-                        msg = 'Queued: `' + str(self.max_playlist_length) + ' songs`'
-                        await self.client.send_message(message.channel, msg.format(message))
-
-                    # Else it is a single video
-                    else:
-                        # Get video url, title and set requester
-                        url = result['webpage_url']
-                        title = result['title']
-                        user = message.author.mention
-                        name = message.author.name
-                        id = message.author.id
-                        # Make sure the video title cannot break code box in message
-                        if '`' in title:
-                            title = title.replace('`', '\'')
-                        # Add info to playlist
-                        self.playlist.append({'url': url, 'title': title, 'user': user, 'name': name, 'id':id})
-                        print(title + ' Added to queue')
-
-                        # Tell user the song has been queued
-                        msg = 'Added to queue: `' + title + '`'
-                        await self.client.send_message(message.channel, msg.format(message))
+                            # Tell user the song has been queued
+                            msg = 'Added to queue: `' + title + '`'
+                            await self.client.send_message(message.channel, msg.format(message))
 
             # Soundcloud Section
             elif type == 's':
@@ -289,6 +292,31 @@ class Player(discord.Client):
                         # Tell the user the song has been queued
                         msg = 'Queued: `' + title + '`'
                         await self.client.send_message(message.channel, msg.format(message))
+                        # Soundcloud Section
+
+            elif type == 'b':
+                ytdl = youtube_dl.YoutubeDL({'playlistend': self.max_playlist_length})
+                try:
+                    result = ytdl.extract_info(url, download=False)
+                    cont = True
+                except youtube_dl.utils.DownloadError as e:
+                    cont = False
+                    if 'Unable to download JSON metadata' in str(e):
+                        print('Invalid Bandcamp link')
+                        msg = '{0.author.mention} : Not a valid Bandcamp song'
+                        await self.client.send_message(message.channel, msg.format(message))
+                if cont == True:
+                    url = result['webpage_url']
+                    title = result['title']
+                    user = message.author.mention
+                    name = message.author.name
+                    id = message.author.id
+                    if '`' in title:
+                        title = title.replace('`', '\'')
+                    self.playlist.append({'url': url, 'title': title, 'user': user, 'name': name, 'id': id})
+                    print(title + ' Added to queue')
+                    msg = 'Queued: `' + title + '`'
+                    await self.client.send_message(message.channel, msg.format(message))
 
 
 
@@ -322,15 +350,17 @@ class Player(discord.Client):
             else:
                 return self.player
 
-    async def audio_player(self, new=False):
 
-        '''
-        Function to play music for playlist and manage it
-        Arguments
-        ---------------
-        new: bool (True for when playlist is empty)
-        return: None
-        '''
+
+
+
+
+
+
+
+
+
+    async def audio_player(self, new=False):
 
         loop = True
         while loop:
@@ -354,8 +384,7 @@ class Player(discord.Client):
                 Cont = False
                 try:
                     # Load audio
-                    player = await self.get_player(self.client.voice_client_in(self.server).channel, new=True,
-                                                   url=self.playlist[0]['url'])
+                    player = await self.get_player(self.client.voice_client_in(self.server).channel, new=True,url=self.playlist[0]['url'])
                     Cont = True
                 except youtube_dl.utils.ExtractorError:
                     # Display error message is blocked
@@ -372,12 +401,19 @@ class Player(discord.Client):
                     Cont = False
 
                 if Cont:
-                    mins = int(player.duration / 60)
-                    secs = player.duration % 60
+
+                    if "bandcamp.com" not in self.playlist[0]['url']:
+                        mins = int(player.duration / 60)
+                        secs = player.duration % 60
+
                     title = self.playlist[0]['title']
                     currently_playing = title
                     await self.client.change_status(discord.Game(name=currently_playing))
-                    if secs < 10:
+
+                    if "bandcamp.com" in self.playlist[0]['url']:
+                        temp_msg = 'Now Playing: `' + title + ' [Bandcamp]` \nRequested by ' + self.playlist[0]['user']
+
+                    elif secs < 10:
                         temp_msg = 'Now Playing: `' + title + ' (' + str(mins) + ':0' + str(
                             secs) + 's)` \nRequested by ' + self.playlist[0]['user']
                     else:
@@ -406,22 +442,10 @@ class Player(discord.Client):
                     self.skips_needed = 0
                     self.votes = []
 
-                    # Loop to sleep audio player till song is finished, max length is reached or someone skips
-                    i = 0
-                    if player.duration > self.player_length:
-                        while i < self.player_length:
-                            if self.skip:
-                                i = self.player_length + 1
-                            else:
-                                await asyncio.sleep(1)
-                                i += 1
-                    else:
-                        while i < player.duration:
-                            if self.skip:
-                                i = player.duration + 1
-                            else:
-                                await asyncio.sleep(1)
-                                i += 1
+
+                    while self.player.is_playing() and not self.skip:
+                        await asyncio.sleep(1)
+
 
                 # Clear playlist of that song
                 if self.playlist:
@@ -451,20 +475,18 @@ class Player(discord.Client):
     async def remove_song(self,message,song_int,admin=False):
         song_int = int(song_int)
         if len(self.playlist)==0:
-            await discord.Client.send_message(self.client, message.channel, "Playlist is empty, cannot remove song.")
+            await discord.Client.send_message(self.client, message.channel, "Playlist is empty, there are no songs to remove.")
         elif song_int==0:
-            await discord.Client.send_message(self.client, message.channel, "Cannot remove the currently playng song.")
+            await discord.Client.send_message(self.client, message.channel, "Cannot remove the currently playng song. Try skipping it instead.")
         else:
             if admin == True or message.author.id == self.playlist[song_int]['id']:
                 try:
+                    await discord.Client.send_message(self.client, message.channel, ("`"+self.playlist[song_int]['title'] + "` has been removed from the playlist by " + message.author.mention))
                     del self.playlist[song_int]
-                    await discord.Client.send_message(self.client, message.channel,"Song number " + str(song_int) + " has been removed from the playlist.")
                 except:
-                    await discord.Client.send_message(self.client, message.channel,
-                                                      "Song number " + str(song_int) + 1 + " could not be removed from the playlist.")
+                    await discord.Client.send_message(self.client,message.channel,("`"+self.playlist[song_int]['title']+"` could not be removed from the playlist."))
             else:
-                await discord.Client.send_message(self.client, message.channel,
-                                                  "Only an admin or the submitter can remove a song from the playlist.")
+                await discord.Client.send_message(self.client, message.channel,"Only an admin or the submitter can remove a song from the playlist.")
 
 
 
@@ -472,6 +494,8 @@ class Player(discord.Client):
 
 
     async def get_queue(self, message):
+
+
         if len(self.playlist) < 2:
             msg = "`There's nothing in the playlist right now :( Feel free to add something!`"
         else:
@@ -479,11 +503,14 @@ class Player(discord.Client):
                 prange = 26
             else:
                 prange = len(self.playlist)
-
-            msg = '```erl\nSongs in playlist:\n'
+            title = 'Songs in the '+message.server.name+' Playlist:'
+            breaker = ""
+            for letter in title:
+                breaker+="-"
+            msg = '```markdown\n'+title+'\n'+breaker+'\n\n# Currently Playing: '+self.playlist[0]['title']+': Requested by '+self.playlist[0]['name']+"\n\n"
 
             for i in range(1, prange):
-                msg = msg + str(i) + '. ' + self.playlist[i]['title'] + ': Requested by ' + self.playlist[i]['name'] + '\n'
+                msg = msg + "[ "+str(i) + '. ' + self.playlist[i]['title'].replace("[","(").replace("]",")") + ': ][ Requested by ' + self.playlist[i]['name'] + ' ]\n'
             msg = msg + '```'
 
         await discord.Client.send_message(self.client, message.author, msg.format(message))
@@ -497,11 +524,15 @@ class Player(discord.Client):
 
     # Set player volume
     async def change_volume(self, percentage, message_channel):
-        # Check that the percentage is vaild
-        if int(percentage) < 0 or int(percentage) > 100:
+        if str(percentage) == "over 9,000" or str(percentage) == "over 9000":
+            self.volume = 250 / 100
+            if self.player is not None:
+                self.player.volume = self.volume
+            await self.client.send_message(message_channel,':notes: HOLY SHIT, Over 9,000!')
+
+        elif int(percentage) < 15 or int(percentage) > 150:
             # Send user error message for invalid percentage
-            await self.client.send_message(message_channel,
-                                           ':anger: Volume is done by percentage between 0%  and 100%, Please pick a vaild percentage')
+            await self.client.send_message(message_channel,':anger: Volume is done by percentage between 15%  and 150%, Please pick a vaild percentage')
         else:
             # Change percentage to a valid number for ffmpeg or avconv
             self.volume = int(percentage) / 100
@@ -509,8 +540,7 @@ class Player(discord.Client):
             if self.player is not None:
                 self.player.volume = self.volume
             # Send volume has been changed message
-            await self.client.send_message(message_channel,
-                                           ':notes: Volume has been changed to: **{0}%**'.format(percentage))
+            await self.client.send_message(message_channel,':notes: Volume has been changed to: **{0}%**'.format(percentage))
 
 
 
@@ -599,7 +629,11 @@ class Player(discord.Client):
         else:
             current_song = self.playlist[0]['title']
             requested_by = self.playlist[0]['name']
-            mins = int(self.player.duration / 60)
-            secs = self.player.duration % 60
-            await discord.Client.send_message(self.client, message.channel, "Currently playing: `"+current_song+" ("+str(mins)+":"+str(secs)+")`\nRequested by: `"+requested_by+"`")
+
+            if "bandcamp" in str(self.playlist[0]['url']):
+                await discord.Client.send_message(self.client, message.channel,message.author.mention+"\nCurrently playing: `"+current_song+" [Bandcamp]`\nURL: `"+self.playlist[0]['url']+"`\nRequested by: `" + requested_by+"`")
+            else:
+                mins = int(self.player.duration / 60)
+                secs = self.player.duration % 60
+                await discord.Client.send_message(self.client, message.channel,message.author.mention+"\nCurrently playing: `"+current_song+" ("+str(mins)+":"+str(secs)+")`\nURL: `"+self.playlist[0]['url']+"`\nRequested by: `" + requested_by+"`")
 

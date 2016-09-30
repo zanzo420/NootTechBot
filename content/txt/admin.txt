@@ -1,12 +1,30 @@
-Admin Commands:
- {}connect (Admin Only) Gets bot to join current channel.
- {}disconnect (Admin Only) Disconnects Bot from current channel.
- {}skip (Admin Only) Skips current song being played by Bot.
- {}game [Game] - Set game played by Bot.
- {}avatar [URL] - Sets the bot avatar.
- {}stream - Links everyone to the current servers streamer link.
- {}block [@username] - Adds specified user to the bot blacklist
- {}unblock [@username] - Removes specified user to the bot blacklist
- {}blacklist - DMâ€™s you the current blacklist of users on your server
+General Owner/Admin/Mod/subMod Commands:
+----------------------------------------
+# Bot Owner (Only)
+ [{}lock][] - Locks all users from using commands.
+ [{}leave][] - Bot leaves server that the command is sent in.
+ [{}unlock][] - Unlocks all users, allowing commands.
+ [{}invite][] - Gets the bot invite link.
+ [{}prefix][PREFIX] - Changes the current command prefix
+ [{}restart][] - Restarts the bot.
+ [{}shutdown][] - Shuts down the bot.
+
+# Admin (Only)
+ [{}connect][] - Gets bot to join current channel.
+ [{}game][GAME-TITLE] - Set game played by Bot.
+ [{}avatar][IMAGE-URL] - Sets the bot avatar.
+
+# Admin & Mod
+ [{}disconnect][] - Disconnects Bot from current channel.
+ [{}skip][-f] - Force Skips current song being played by Bot.
+ [{}block][@USER] - Adds specified user to the bot blacklist
+ [{}unblock][@USER] - Removes specified user to the bot blacklist
+ [{}blacklist][] - PMs you the current blacklist of users on your server
+ [{}endvote][] - End a vote in the voting text-channel
+
+# Admin, Mod and subMod
+ [{}stream][] - Links everyone to the current servers streamer link.
+ [{}volume][NUMBER] - Toggles the bot player volume (mods/admins only)
+ [{}startvote][TOPIC] - Start a vote in the voting text-channel.
 
 end

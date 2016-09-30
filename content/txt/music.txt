@@ -1,10 +1,24 @@
-Music Commands:
- {}add [Link] or - Adds YouTube or Soundcloud song.
- {}add [Phrase] - Adds first YouTube video result to playlist.
- {}playlist - Shows the current music playlist.
- {}song/!playing/!currentsong - Shows currently playing song
- {}skip - Submits your vote to skip a song (force-skip admin only).
- {}remove [Song Number] - Removes a song from the playlist (admin/submitter only)
- {}volume - Toggles the bot volume (mods/admins only)
+General Music Commands:
+-----------------------
+ [{}song][] - Shows currently playing song
+ [{}playing][] - Shows currently playing song
+ [{}currentsong][] - Shows currently playing song
+ [{}playlist][] - Shows the current music playlist.
+ [{}skip][] - Submits your vote to skip a song (force-skip admin only).
+ [{}skip][-f] - Force skips song (Admin Only).
+ 
+ [{}add][SONG URL] or...
+ [{}add][SONG NAME] - Adds YouTube, Bandcamp or Soundcloud Song/Playlist.
+ [{}remove][NUMBER] - Removes a song from the playlist (admin/submitter only)
+ [{}volume][NUMBER] - Toggles the bot volume (mods/admins only)
+
+
+Music Settings (Admin):
+-----------------------
+ [{}music settings][] - Displays all current music settings (Per Server).
+ [{}music queue-limit][NUMBER] - Max songs from Playlist Link allowed (Default = 3).
+ [{}music song-length][NUMBER] - Max song length before auto-skip (Default = 10).
+ [{}music max-requests][NUMBER] - Max user song requests (Default = 4).
+ [{}music max-capacity][NUMBER] - Max playlist song capacity (Default = 25).
 
 end

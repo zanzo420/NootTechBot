@@ -1,0 +1,14 @@
+Voting Commands (Admin):
+-----------------------
+ [{}startvote][TOPIC] - Clears the #Vote chat and begins a new PRIVATE vote with set topic.
+ [{}startvote -public][TOPIC] - Clears the #Vote chat and begins a new PUBLIC vote with set topic.
+ [{}endvote][] - Ends the vote manually.
+
+Voting Commands:
+----------------
+ [{}vote][yes] - Submits a 'Yes' vote.
+ [{}vote][no] - Submits a 'No' vote.
+ [{}vote][topic] - Displays the current vote topic.
+ [{}results][] - Displays the results of the vote that has just ended.
+
+end

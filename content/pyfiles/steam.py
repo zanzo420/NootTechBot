@@ -7,7 +7,7 @@ import configparser
 
 # Open up settings.ini with a text-editor and enter in your Steam API key and preferred settings then save the file.
 settings = configparser.ConfigParser()
-settings.read('content/Settings.ini')
+settings.read('Settings.ini')
 key = settings['STEAM']['APIKey'] # Sets steam API key
 
 

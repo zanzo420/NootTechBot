@@ -11,3 +11,5 @@ numpy
 wordcloud
 pillow
 goslate
+gitpython
+wolframalpha

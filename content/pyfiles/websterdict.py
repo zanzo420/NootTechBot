@@ -3,7 +3,7 @@ import bs4
 import configparser
 
 settings = configparser.ConfigParser()
-settings.read('content/Settings.ini')
+settings.read('Settings.ini')
 key = settings['MERRIAM-WEBSTER-DICT']['APIToken'] # Sets steam API key
 
 MWKey = '65dd7533-0e1e-44ea-8c40-e21d300f2c50'
